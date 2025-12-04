@@ -11,14 +11,7 @@ Step 1: Taxonomic Hierarchy Query
 - Name the columns "species_name", "genus_name", "family_name", "order_name" in the query result
 """
 def taxonomic_hierarchy_query(arq: ARQModel) -> rai.Fragment:
-    return rai.where(
-        arq.Species.genus.canonical_name == "Acaena"
-    ).select(
-        arq.Species.canonical_name.alias("species_name"),
-        arq.Species.genus.canonical_name.alias("genus_name"),
-        arq.Species.family.canonical_name.alias("family_name"),
-        arq.Species.order.canonical_name.alias("order_name"),
-    )
+    raise NotImplementedError("TODO: Implement the taxonomic hierarchy query")
 
 
 def test_solution(result: pd.DataFrame) -> None:

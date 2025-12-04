@@ -11,13 +11,7 @@ Step 2: Species Richness by Region
 - Name the columns "country_code", "species_count", "observation_count" in the query result
 """
 def species_richness_query(arq: ARQModel) -> rai.Fragment:
-    return rai.select(
-        rai.count(arq.Species).where(
-            arq.Observation.classification == arq.Species
-        ).per(arq.Observation.country_code).alias("species_count"),
-        rai.count(arq.Observation).per(arq.Observation.country_code).alias("observation_count"),
-        arq.Observation.country_code.alias("country_code"),
-    )
+    raise NotImplementedError("TODO: Implement the species richness query")
 
 
 def test_solution(result: pd.DataFrame) -> None:

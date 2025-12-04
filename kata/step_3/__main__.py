@@ -12,25 +12,7 @@ Step 3: Summer Solstice Observations by Location
 - Name the columns "species_count", "family_name", "country_code", "state_province"
 """
 def early_bloomers_query(arq: ARQModel) -> rai.Fragment:
-    dayofyear = std.datetime.datetime.dayofyear
-    delta_days = std.math.abs(dayofyear(arq.Solstice.datetime) - dayofyear(arq.Observation.event_datetime))
-
-    return rai.where(
-        arq.Observation.classification(arq.Species),
-        arq.Species.family(arq.Family),
-        arq.Solstice.summer(arq.Observation.hemisphere),
-        delta_days < 20,
-        species_count := rai.count(arq.Species).per(
-            arq.Family,
-            arq.Observation.country_code,
-            arq.Observation.state_province,
-        ),
-    ).select(
-        species_count.alias("species_count"),
-        arq.Family.canonical_name.alias("family_name"),
-        arq.Observation.country_code.alias("country_code"),
-        arq.Observation.state_province.alias("state_province"),
-    )
+    raise NotImplementedError("TODO: Implement the summer solstice observations query")
 
 
 def test_solution(result: pd.DataFrame) -> None:
