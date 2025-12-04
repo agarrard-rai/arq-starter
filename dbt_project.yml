@@ -7,7 +7,7 @@ profile: 'default'
 model-paths: ["dbt/models"]
 #analysis-paths: ["analyses"]
 #test-paths: ["tests"]
-#seed-paths: ["seeds"]
+seed-paths: ["dbt/seeds"]
 #macro-paths: ["macros"]
 #snapshot-paths: ["snapshots"]
 
@@ -19,7 +19,5 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   arbor_quest:
     staging:
-      +materialized: table
-    graph:
       +materialized: table
 

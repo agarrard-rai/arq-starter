@@ -3,6 +3,11 @@ Observation Exploratory Data Analysis
 
 This module provides queries for analyzing plant observation data from GBIF,
 including taxonomic distributions, temporal patterns, and spatial analysis.
+
+Run queries using `uv run -m kg.apps.observation_eda <function> <args>` eg
+- `uv run -m kg.apps.observation_eda observations_per_genus --threshold 100`
+- `uv run -m kg.apps.observation_eda nearby_observations`
+- `uv run -m kg.apps.observation_eda species_before_summer_solstice_by_class --year 2025`
 """
 
 import argparse
@@ -61,6 +66,38 @@ def nearby_observations(arq: ARQModel) -> rai.Fragment:
         obs1.day_of_year == obs2.day_of_year,
     ).select(
         rai.count(obs1, obs2).alias("cooccurrence_count"),
+    )
+
+
+def species_before_summer_solstice_by_class(arq: ARQModel, year: int = 2025) -> rai.Fragment:
+    """Count species observed before summer solstice in the US, grouped by class.
+
+    Finds species observations that occurred:
+    - In the United States (country code "US")
+    - Before the summer solstice for the given year
+    - Groups by taxonomic class
+
+    Args:
+        year: The year to analyze (default: 2025)
+
+    Returns:
+        A query fragment with columns:
+        - species_count: Number of distinct species observed before summer solstice
+        - class_name: Canonical name of the taxonomic family
+    """
+
+    return rai.where(
+        arq.Observation.country_code("US"),
+        arq.Observation.year(year),
+        arq.Observation.classification(arq.Species),
+        arq.Species.class_(arq.Class),
+        arq.Solstice.year(year),
+        arq.Solstice.summer(arq.HemisphereNorth),
+        arq.Observation.event_datetime < arq.Solstice.datetime,
+        species_count := rai.count(arq.Species).per(arq.Class),
+    ).select(
+        species_count.alias("species_count"),
+        arq.Class.canonical_name.alias("class_name"),
     )
 
 ## ↓ brought to you by Claude

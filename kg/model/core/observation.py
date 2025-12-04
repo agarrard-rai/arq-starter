@@ -18,14 +18,9 @@ def define_observation(m: rai.Model, source: Table):
 
     # Define value concepts for observation attributes
     m.EventDateTime = m.Concept("EventDateTime", extends=[rai.DateTime])
-    m.DayOfYear = m.Concept("DayOfYear", extends=[rai.Integer])
-    m.Year = m.Concept("Year", extends=[rai.Integer])
     m.BasisOfRecord = m.Concept("BasisOfRecord", extends=[rai.String])
     m.CountryCode = m.Concept("CountryCode", extends=[rai.String])
     m.StateProvince = m.Concept("StateProvince", extends=[rai.String])
-    m.Latitude = m.Concept("Latitude", extends=[rai.Float])
-    m.Longitude = m.Concept("Longitude", extends=[rai.Float])
-    m.H3Cell = m.Concept("H3Cell", extends=[rai.Integer])
 
     # Define properties
     m.Observation.event_datetime = m.Property("{Observation} occurred on {EventDateTime}")
@@ -46,6 +41,7 @@ def define_observation(m: rai.Model, source: Table):
 
     # Relationships
     m.Observation.classification = m.Property("{Observation} is classified as {Taxon}")
+    m.Observation.hemisphere = m.Relationship("{Observation} is in {Hemisphere}")  # populated in derived/observation.py
 
     # Bind source data to concepts
     rai.define(m.Observation.new(id=source.GBIFID))

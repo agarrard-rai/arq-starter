@@ -3,9 +3,13 @@ from typing import Protocol
 import relationalai.semantics as rai
 from relationalai.semantics.snowflake import Table
 
+from kg.model.core.calendar import define_calendar
+from kg.model.core.geography import define_geography
+from kg.model.core.soleq import define_solstice_equinox
 from kg.model.core.taxon import define_taxon
 from kg.model.core.observation import define_observation
 from kg.model.derived.taxonomy import define_taxonomy
+from kg.model.derived.observation import define_derived_observation
 
 
 # Protocol definitions for the attributes dynamically assigned to the model
@@ -42,6 +46,58 @@ class Observation(Protocol):
     h3_cell_9: rai.Relationship
     h3_cell_10: rai.Relationship
     classification: rai.Relationship
+    hemisphere: rai.Relationship
+
+
+class Hemisphere(Protocol):
+    id: rai.Relationship
+
+
+class CalendarEvent(Protocol):
+    year: rai.Relationship
+    datetime: rai.Relationship
+
+
+class Solstice(Protocol):
+    year: rai.Relationship
+    datetime: rai.Relationship
+    summer: rai.Relationship
+    winter: rai.Relationship
+
+
+class Equinox(Protocol):
+    year: rai.Relationship
+    datetime: rai.Relationship
+    spring: rai.Relationship
+    fall: rai.Relationship
+
+
+class Species(Taxon, Protocol):
+    pass
+
+
+class Genus(Taxon, Protocol):
+    pass
+
+
+class Family(Taxon, Protocol):
+    pass
+
+
+class Order(Taxon, Protocol):
+    pass
+
+
+class Class(Taxon, Protocol):
+    pass
+
+
+class Phylum(Taxon, Protocol):
+    pass
+
+
+class Kingdom(Taxon, Protocol):
+    pass
 
 
 class ARQModel(Protocol):
@@ -66,15 +122,25 @@ class ARQModel(Protocol):
     # Entity concepts
     Taxon: Taxon
     Observation: Observation
+    Hemisphere: Hemisphere
+    CalendarEvent: CalendarEvent
+    Solstice: Solstice
+    Equinox: Equinox
+
+    # Hemisphere instances
+    HemisphereNorth: Hemisphere
+    HemisphereSouth: Hemisphere
+    HemisphereEast: Hemisphere
+    HemisphereWest: Hemisphere
 
     # Taxonomic hierarchy concepts
-    Species: rai.Concept
-    Genus: rai.Concept
-    Family: rai.Concept
-    Order: rai.Concept
-    Class: rai.Concept
-    Phylum: rai.Concept
-    Kingdom: rai.Concept
+    Species: Species
+    Genus: Genus
+    Family: Family
+    Order: Order
+    Class: Class
+    Phylum: Phylum
+    Kingdom: Kingdom
 
 
 def define_arq(m: rai.Model, db: str = "TEAM_ARQ", schema: str = "PUBLIC") -> ARQModel:
@@ -91,11 +157,17 @@ def define_arq(m: rai.Model, db: str = "TEAM_ARQ", schema: str = "PUBLIC") -> AR
     # Define source table binding helper
     source = lambda t: Table(f"{db}.{schema}.{t}")
 
+    # Define foundational concepts first (used by other modules)
+    define_calendar(m)
+    define_geography(m)
+
     # Define core model and bindings
     define_taxon(m, source("TAXON"))
     define_observation(m, source("OBSERVATION_10k"))
+    define_solstice_equinox(m, source("ASTROPIXELS_SOLEQ"))
 
     # Define derived concepts
     define_taxonomy(m)
+    define_derived_observation(m)
 
     return m

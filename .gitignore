@@ -16,3 +16,5 @@ logs/
 **/debug.jsonl
 .claude/
 metadata.json
+profiles.yml
+.user.yml
